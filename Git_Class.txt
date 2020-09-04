@@ -1,0 +1,394 @@
+1. git 홈페이지에서 다운
+	1) 홈페이지 > downloads > windows
+	2) 홈페이지 > 왼쪽 하단 부분에 read online for free(무료 배포 교재)
+	3) 설치파일 실행 > 걍 다 Next 누르기 > 브라우저 창 그냥 끄면 됨. 설치 끝
+
+2. 시작메뉴 - git bash
+	git config --global user.name "본인이름영어로넣기"
+	git config --global user.email 이메일주소넣기
+
+3. acorn/hyeonji에 gitlab 폴더 생성
+	- 그 안에 FirstProject 폴더 생성
+	- FirstProject 폴더에 first.txt 생성(안에 아무 내용 없어도 됨)
+
+4. FirstProject 폴더에서 git bash 실행
+	git init		: 실행 후 맨 뒤에 master 붙는지 확인
+	git status		: untracked files 이후에 first.txt가 빨갛게 떠야 함
+	git add first.txt	: 아무것도 안 뜨는 거 맞음
+	git status		: 실행 후 new file: first.txt가 떠야 함
+
+	git commit	please enter the commit ~ 이하가 나옴
+			i 누르고
+			이것은 첫 번째 커밋입니다	: 입력
+			esc
+			:wq
+			
+			1 file changed, 이하 내용이 나옴
+
+	git status		: nothing to commit 내용 나오면 맞음
+	
+
+
+5. FirstProject 폴더에 second.txt 생성
+	git status		: second.txt가 빨갛게 뜸
+	git add .
+	git status		: second.txt가 초록색으로 변함
+	git commit -m "두 번째 커밋입니다."
+	git status		: nothing to commit 뜨면 맞음
+
+
+
+6. FirstProject 폴더에 third.txt 생성
+	git status		: third.txt 빨갛게 뜸
+	git add third.txt
+	git status		: third.txt 초록색으로 변함
+	
+	메모장에 "세 번째 파일입니다." 쓰고 저장
+
+	git status		: third.txt 빨갛게 뜸
+	git add third.txt
+	git status		: nothing to commit 뜨면 맞음
+
+	git status -s	: 방금 전 저장한 파일이 뭔지 알 수 있음 - third.txt
+
+
+
+7. FirstProject 폴더에 fourth.txt 생성
+	메모장에 "이것은 네 번째 파일입니다." 쓰고 저장
+
+	git status		: fourth.txt 빨갛게 뜸
+	git add fourth.txt 
+	git status		: fourth.txt 초록색으로 변함, third.txt도 뜸 - 아까 commit을 안 했기 때문
+	
+	메모장 들어가서 엔터 치고 "이것은 첫 번째 수정입니다." 쓰고 저장
+
+	git status		: fourth.txt 빨갛게 뜸 - 수정했기 때문
+	git diff		: 이전 내용이랑 뭐가 달라졌는지 확인하는 것.
+	git add fourth.txt 
+	git status
+	git diff		: 아무것도 안 뜸 - stage 올라가기 전에 차이점을 확인하는 것이라 add 한 뒤에는 소용 없음.
+	git diff --staged	: stage 올라간 이후에도 차이점(수정)을 확인할 수 있음
+	git commit -m "세번째와 네번째 파일을 커밋합니다."
+	git log -p	
+		나갈때는 esc 누르고 :q
+
+----------------------------------------------------------------------
+
+8. Github 로그인
+
+new repository
+
+
+
+-------------------------------------------------------------------------
+  	git remote
+	git remote add origin 깃헙주소
+	git remote
+	git remote -v
+	git push origin master	: 	origin에 업로드를 하겠다
+
+---------------------------------------------------------------------------
+
+	github 확인 	: 변해있다.
+	add file ->fifth.txt 
+
+
+-------------------------------------------------------------------------------------
+	git add sixth.txt
+	git commit -m "여섯번째 커밋입니다"
+	git push origin master 	: 거부당함 , 아까 add file하면서 내 컴퓨터와 참조하는 서버(깃헙)과 모양이 달라졌기 때문. 따라서 다운로드 먼저 받아야 한다.
+	git pull origin 
+	
+	i 누르고 첫번째 머지(merge)입니다. 
+	esc :wq
+
+--------------------------------------------------------------------------------------
+	cd .. 	: 배시 끄기
+	탐색기 FisrtProject 삭제
+
+---------------------------------------------------------------------------------------
+	gitlab 폴더에서 bash열기
+	
+	git clone https://github.com/Chachaeul/FirstProject.git	 : 누군가가 서버에 올려놓은 것을 복사 , 탐색기에 폴더가 잘 만들어져있다.
+
+----------------------------------------------------------------------------------------
+
+	github 서버에서 이미지하나 올리기
+
+	cd FirstProject
+
+	git fetch origin
+	git merge origin 	: 폴더 확인해보면 이미지 들어가있다.
+
+----------------------------------------------------------------------------------------
+
+	git tag -a v1.0 -m "첫번째 릴리즈 입니다."		
+	git tag
+	git show v1.0 	: 내가 tagging 하기 전까지에 대한 작업 내용을 볼 수 있다.
+
+	git log 	: 지금까지 한 history 볼 수 있다.
+	태깅할 곳 포인트 잡아서 6글자 정도 복사해놓기
+	
+	git tag -a v0.8 <복사한것> 	:미처 tag하지 못한 곳 tagging가능
+	git show v0.8
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+08.27 (+ 현지 따라해)
+
+1. 필기
+
+2. gitlab폴더 firstproject 폴더만 남기고 내용 다 지우기
+
+3. github에 FirstProject에서 상단 메뉴 중 settings -> 맨 밑 Danger Zone ->  Delete this repository ->  바로 위에 적힌 Chachaeul/FirstProject 복붙 -> 빨간버튼 클릭
+
+4. github에 새 프로젝트 만들기, 이름 : FirstProject 
+
+5. FirstProject에서 bash열기
+
+6. 명령어
+	git init	: 프로젝트 시작 (이미 서버에 만들어져 있으면 clone으로 시작)
+
+	echo "1111" >> a.txt
+
+	git status
+
+	git add .
+	
+	git status
+
+	git commit -m "1111 추가"
+
+	echo "2222" >> b.txt
+
+	git add .
+		
+	git commit -m "2222 추가"
+
+	echo "3333" >> c.txt
+
+	git add .
+		
+	git commit -m "3333 추가"
+
+	echo "4444" >> d.txt
+
+	git add .
+		
+	git commit -m "4444 추가"
+
+	git remote add origin https://github.com/Chachaeul/FirstProject.git
+
+	git push origin master
+	
+	git log
+
+	git reset --hard fbdf437d 	: hard 모든 것을 다 지워버린다, 워크 디렉토리까지 다 삭제 해버림
+
+	git log
+
+	git push origin +master	 : 서버 확인 a,b 빼고 다 지워져있음. 위험한 방법. 잘 쓰지 않는다
+
+
+
+------------------------------------------------------------------------------------------
+	git commit -m "3333 추가"
+
+	echo "4444" >> d.txt
+
+	git add .
+		
+	git commit -m "4444 추가"
+
+	git log --graph	: 지금은 1라인으로 배워서 큰 효과가 없지만, branch 등을 배우면 예쁘게 볼 수 있다.
+
+	git log --graph --oneline
+
+	
+	git revert <4444의 체크섬>
+	i 누르고 4444 revert 입력 esc :wq
+
+	git log 	: revert한 내용까지 보여주고 있다. reset보다 안전.
+
+	git revert --no-commit <3333의 체크섬>
+
+	git log 	: no commit을 했기 떄문에 revert가 commit된 메시지는 남지 않음
+
+
+------------------------------------------------------------------------------------------
+	firstproject 파일 다지우고  다시 bash
+
+
+	git init
+		
+	echo "main 파일입니다.." >index.html
+
+	Firstproject 폴더에 이미지 파일 하나 넣기
+
+	git add .
+
+	 git commit -m "기본 구조입니다."
+
+	git branch login
+
+	git branch 	: login, master 두개가 나오늘 것이 보인다. 초록색 master - 작업중이다.
+
+	git checkout login	: 헤드를 옮길때 (login으로 옮김)
+
+	git branch 	: login이 초록
+
+
+	
+			
+
+------------------------------------------------------------------------------------------
+
+	firstproject 에 login 폴더 만들고 login.jsp 파일 만들기 
+		모든 작업은 master에서 하지 않고 밑에서 한 다음 merge만 해준다 전략
+
+	git status
+
+	git add .
+	
+	git commit -m "로그인 기능 추가"
+
+	git checkout master	: 탐색기 확인해보면 login없음
+
+
+	git branch board		: 하나 더 만든다.
+
+	git branch
+
+	git checkout board
+
+	firstproject 에 board 폴더 만들고 list.jsp 파일 만들기 
+
+	git add .  
+
+	git commit -m "게시판 기능 추가"
+
+	git checkout master : 탐색기 확인해보면 board 없음
+
+(현재 위치 master)
+
+	git merge login	: Fast-forward(선형) 방식으로 합쳐진 것이다. 탐색기 가보면 login있음
+
+	git branch -d login
+
+	git branch 	 : login 삭제 된 것을 알 수 있따.
+
+	git checkout board
+
+	board 폴더안에 insert.jsp 파일 추가
+
+	git add .
+
+	git commit -m "글쓰기 페이지 추가"
+
+
+	git checkout master
+
+	git merge board
+		i 누르고 글쓰기 페이지 추가 3 way merge 입력 esc :wq
+
+
+	탐색기 board에서 insert.html 노트패드로 열어서 
+		<h2>master에서 작성한 내용</h2> 입력
+
+	git commit -a -m "insert.html을 수정"
+
+
+	git checkout board	: 탐색기로 가면 login은 없음. 
+
+
+	탐색기 board의 insert.html에 아무것도 없다.
+		<h2>master에서 작성한 내용</h2> 입력
+
+
+	git commit -a -m "board브랜치에서 insert.html을 수정"
+
+	git checkout master
+
+	git merge board	 : 충돌. 
+		
+	insert파일 가면 어디에서 충돌났는지 알 수 있다.	 <<<<<HEAD ~~~ ; 소스를 직접 고쳐야
+		<h2>master에서 작성한 내용</h2>
+		충돌 코드 해결
+
+
+	git commit -a -m "충돌 해결"
+
+	git merge board
+
+------------------------------------------------------------------------------------------
+
+github에서 firstproject 아까 처럼 삭제하고 다시 만들기
+	
+	 git remote add first https://github.com/Chachaeul/FirstProject.git
+
+	git remote
+
+	git push first mastergit 
+
+
+github에서 master누르고 member 입력 후 엔터 	: 멤버 브랜치 추가
+add file -> create new file -> 이름 : member_insert.html
+
+	git pull first member
+
+	git branch 	: 탐색기 확인해보면 병합돼있음git 
+
+	git push first master
+		girhub master에도 member_insert.html 파일 추가 된 것을 볼 수 있따.
+
+
+------------------------------------------------------------------------------------------
+(원격으로 member branch 삭제하기, 합쳐진 branch는 필요가 없음. 바로바로 삭제 해주는 것이 좋다)
+
+	git push first --delete member	 : gihub에서 보면 member 삭제 돼있는 것을 볼 수 있다.
+
+
+------------------------------------------------------------------------------------------
+(fork 할 것)
+	firstprogect 폴더 삭제
+
+팀장 - settings - manage access - invite collaborator
+
+
+팀원 
+git branch chacha
+
+git checkout chacha
+
+echo "noeulcute" >> cute.txt
+
+git add .
+      
+git commit -m "cute 추가"
+
+git remote add origin https://github.com/Chachaeul/FirstProject.git
+
+git push origin chacha
+
+git push chacha master
+
+
+팀장
+
+git clone https://github.com/Chachaeul/FirstProject.git
+
+cd FirstProject
+
+git push chacha master
+
+git pull origin chacha
+
+git push origin master
+
+git push origin --delete chacha
+
+
+------------------------------------------------------------------------------------------
+0828
+
+몽고DB
