@@ -1,0 +1,193 @@
+1. mongodb를 이용한 복제
+
+(1) Master & Slave
+	- 노드 3개 준비
+		Master : port 10000
+		Slave1 : port 10001
+		Slave2 : port 10002
+
+	- 3대의 서버 실행
+		mongod --dbpath c:\mongowork\master --port 10000 --master
+		mongod --dbpath c:\mongowork\slave1 --port 10001 --slave --source localhost:10000
+		mongod --dbpath c:\mongowork\slave2 --port 10002 --slave --source localhost:10000
+
+	- 3대의 클라이언트 준비
+		mongo localhost:10000
+		mongo localhost:10001
+		mongo localhost:10002
+
+	- master에서 작업
+		show collections
+		db.test.insert({a:1})
+		db.test.find()
+
+	- 각 slave에서 작업
+		show collections
+		db.setSlaveOk()
+		db.test.find()
+		db.test.insert({b:2})
+
+	- 첫번째 slave에 결함 생성
+		slave1의 서버 중지
+		slave1의 db 삭제
+
+		다시 slave1 가동
+		mongod --dbpath c:\mongowork\slave1 --port 10001 --slave --source localhost:10000
+
+		클라이언트 재접속
+		mongo localhost:10001
+
+(2) ReplicaSet
+	- 4대의 서버 가동
+		mongod --dbpath c:\mongowork\db1 --port 10001 --replSet rptmongo --oplogSize 10
+		mongod --dbpath c:\mongowork\db2 --port 10002 --replSet rptmongo --oplogSize 10
+		mongod --dbpath c:\mongowork\db3 --port 10003 --replSet rptmongo --oplogSize 10
+		mongod --dbpath c:\mongowork\arbit --port 10004 --replSet rptmongo --oplogSize 10
+
+	- primary로 지정할 client 접속
+		mongo localhost:10001
+		use admin
+
+		db.runCommand(
+			{"replSetInitiate" : {"_id" : "rptmongo", "members" : [ 
+				{"_id" : 1, "host" : "localhost:10001"},
+				{"_id" : 2, "host" : "localhost:10002"},
+				{"_id" : 3, "host" : "localhost:10003"},
+				{"_id" : 4, "host" : "localhost:10004", arbiterOnly : true}
+			] }}
+		)
+
+	- primary에서 입력 테스트
+		use test
+		db.test.insert({a : 1})
+		db.test.find()
+
+	- secondary에서 테스트
+		use test
+		db.setSlaveOk()
+		db.test.find()
+		db.test.insert({b : 2})
+
+	- primary 서버 장애
+		primary 서버 중지
+		primary db 삭제
+
+2. mongodb를 이용한 분산
+
+(1) config 서버 : ReplicaSet으로 구현(3대)
+	c:\mongowork\shard\config1
+	c:\mongowork\shard\config2
+	c:\mongowork\shard\config3
+
+	mongod --configsvr --replSet configRepl --dbpath c:\mongowork\shard\config1 --port 20001
+	mongod --configsvr --replSet configRepl --dbpath c:\mongowork\shard\config2 --port 20002
+	mongod --configsvr --replSet configRepl --dbpath c:\mongowork\shard\config3 --port 20003
+
+	- primary 설정
+		20001포트의 서버로 접속
+		
+		var config = {"_id" : "configRepl", "members" : [
+			{"_id" : 0, "host" : "localhost:20001"},
+			{"_id" : 1, "host" : "localhost:20002"},
+			{"_id" : 2, "host" : "localhost:20003"}
+		]}
+
+		rs.initiate(config)
+
+(2) shard 서버
+	c:\mongowork\shard\shard1\shardRep1
+	c:\mongowork\shard\shard1\shardRep2
+	c:\mongowork\shard\shard1\shardRep3
+
+	c:\mongowork\shard\shard2\shardRep1
+	c:\mongowork\shard\shard2\shardRep2
+	c:\mongowork\shard\shard2\shardRep3
+
+	c:\mongowork\shard\shard3\shardRep1
+	c:\mongowork\shard\shard3\shardRep2
+	c:\mongowork\shard\shard3\shardRep3
+
+	mongod --shardsvr --replSet shardRep1 --dbpath c:\mongowork\shard\shard1\shardRep1 --port 30011
+	mongod --shardsvr --replSet shardRep1 --dbpath c:\mongowork\shard\shard1\shardRep2 --port 30012
+	mongod --shardsvr --replSet shardRep1 --dbpath c:\mongowork\shard\shard1\shardRep3 --port 30013
+
+	mongod --shardsvr --replSet shardRep2 --dbpath c:\mongowork\shard\shard2\shardRep1 --port 30021
+	mongod --shardsvr --replSet shardRep2 --dbpath c:\mongowork\shard\shard2\shardRep2 --port 30022
+	mongod --shardsvr --replSet shardRep2 --dbpath c:\mongowork\shard\shard2\shardRep3 --port 30023
+
+	mongod --shardsvr --replSet shardRep3 --dbpath c:\mongowork\shard\shard3\shardRep1 --port 30031
+	mongod --shardsvr --replSet shardRep3 --dbpath c:\mongowork\shard\shard3\shardRep2 --port 30032
+	mongod --shardsvr --replSet shardRep3 --dbpath c:\mongowork\shard\shard3\shardRep3 --port 30033
+
+	- primary 설정
+		mongo localhost:30011
+		-------------------------------
+		var config = {"_id" : "shardRep1", "members" : [
+			{"_id" : 0, "host" : "localhost:30011"},
+			{"_id" : 1, "host" : "localhost:30012"},
+			{"_id" : 2, "host" : "localhost:30013"}
+		]}
+
+		rs.initiate(config)
+
+		mongo localhost:30021
+		-------------------------------
+		var config = {"_id" : "shardRep2", "members" : [
+			{"_id" : 0, "host" : "localhost:30021"},
+			{"_id" : 1, "host" : "localhost:30022"},
+			{"_id" : 2, "host" : "localhost:30023"}
+		]}
+
+		rs.initiate(config)
+
+		mongo localhost:30031
+		-------------------------------
+		var config = {"_id" : "shardRep3", "members" : [
+			{"_id" : 0, "host" : "localhost:30031"},
+			{"_id" : 1, "host" : "localhost:30032"},
+			{"_id" : 2, "host" : "localhost:30033"}
+		]}
+
+		rs.initiate(config)
+
+(3) Route 서버
+	- config 서버 등록
+		mongos --configdb configRepl/localhost:20001,localhost:20002,localhost:20003
+
+	- Route 서버에 접속
+		mongo localhost:27017
+
+	- shard서버 등록
+		sh.addShard("shardRep1/localhost:30011")
+		sh.addShard("shardRep2/localhost:30021")
+		sh.addShard("shardRep3/localhost:30031")
+
+	- DB 생성
+		sh.enableSharding("test")
+
+	- 인덱스 생성
+		db.thing.createIndex({empno:1})
+
+		use admin
+		sh.shardCollection("test.thing", {empno:"hashed"})
+
+	- Testing
+		use test
+		for(var n=100000; n<110000; n++){
+			db.thing.insert({empno:n, ename:"test", sal:1000})
+		}
+
+		db.thing.count()
+
+	- 각 shard서버에 접속해서 갯수 확인
+		mongo localhost:30011
+		use test
+		db.thing.count()
+
+		mongo localhost:30021
+		use test
+		db.thing.count()
+
+		mongo localhost:30031
+		use test
+		db.thing.count()
